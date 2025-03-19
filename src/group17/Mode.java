@@ -9,7 +9,6 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class Mode extends JPanel implements KeyListener, Runnable{
@@ -21,6 +20,7 @@ public class Mode extends JPanel implements KeyListener, Runnable{
 	private int bots = 0, minBots, maxBots;
 	private String modeState = "Mode";
 	Thread gameThread;
+	private Game game;
 	
 	public Mode() {
 		this.setPreferredSize(new Dimension(500, 500));
@@ -29,8 +29,22 @@ public class Mode extends JPanel implements KeyListener, Runnable{
 		this.setFocusable(true);
 	}
 	
-	public int getModeNum() {
-		return modeNum;
+	public int getPlayers() {
+		return players;
+	}
+	
+	public int getBots() {
+		return bots;
+	}
+	
+	public String getTypeGame() {
+		if(typeGame == 0) {
+			return "Ba cây";
+		}
+		if(typeGame == 1) {
+			return "Tiến lên miền nam";
+		}
+		return "Tiến lên miền bắc";
 	}
 	
 	public void game() {
@@ -137,7 +151,7 @@ public class Mode extends JPanel implements KeyListener, Runnable{
 				
 				if(players == 3) {
 					//add later
-					new Game(getGameType(typeGame));
+					getGameType();
 				}
 				
 				if(players == 4) {
@@ -176,7 +190,7 @@ public class Mode extends JPanel implements KeyListener, Runnable{
 				}
 				if(code == KeyEvent.VK_ENTER) {
 					//add later
-					new Game(getGameType(typeGame));
+					getGameType();
 				}
 			}
 			if(botsMode == 1 && code == KeyEvent.VK_ENTER) {
@@ -336,14 +350,16 @@ public class Mode extends JPanel implements KeyListener, Runnable{
 		g2.drawString(option, x, y);
 	}
 	
-	public String getGameType(int gameMode) {
-		if(gameMode == 0) {
-			return "Ba cây";
+	public void getGameType() {
+		if(typeGame == 0) {
+			// add later
 		}
-		if(gameMode == 1) {
-			return "Tiến lên miền nam";
+		else if(typeGame == 1) {
+			game = new GameTLMN("Tiến lên miền nam", players, bots);
 		}
-		return "Tiến lên miền bắc";
+		else {
+			// add later
+		}
 	}
 
 	@Override

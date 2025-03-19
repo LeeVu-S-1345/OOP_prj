@@ -18,18 +18,29 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-public class Game extends JPanel implements MouseListener, Runnable{
+public class Game extends JPanel implements MouseListener{
+	protected int bots;
+	protected int players;
+	protected int playersNum;
 	private JFrame window = new JFrame();
 	private int height = 670, width = 900;
 	private Color background = new Color(4, 191, 29);
-	private int cardHeight = 140, cardWidth = 89;
-	private int disX = 30, disY = 30;
+	protected int cardHeight = 140;
+	protected int cardWidth = 89;
+	protected int disX = 30;
+	protected int disY = 30;
+	protected ArrayList<Card>[] playerCard;
+	protected ArrayList<Card> deck;
+	protected Card host = new Card();
+	protected int maxCards;
 	Graphics2D g2;
-	private Map<Card, Rectangle> mapCard = new HashMap<Card, Rectangle>();
+	Map<Card, Rectangle> mapCard = new HashMap<Card, Rectangle>();
 	Card selected;
-	private ArrayList<Card> ply = new ArrayList<Card>();
 	
-	public Game(String title) {
+	public Game(String title, int players, int bots) {
+		this.bots = bots;
+		this.players = players + 1;
+		playersNum = this.bots + this.players;
 		window.setTitle(title);
 		window.setSize(width, height);
 		window.setLocationRelativeTo(null);
@@ -38,13 +49,14 @@ public class Game extends JPanel implements MouseListener, Runnable{
 		window.setVisible(true);
 		
 		this.setBackground(background);
+		deck = host.createDeck();
 		window.add(this);
+		System.out.println(this.players);
 	}
 	
-	public void getCollectionCards() {
-		ply.add(new Card("H", "K"));
-		ply.add(new Card("S", "10"));
-		ply.add(new Card("D", "A"));
+	public void newGame(int maxCards, int playersNum) {
+		deck = host.shuffleDeck(deck);
+		playerCard = host.getPlayerCard(deck, playersNum, maxCards);
 	}
 	
 	public ImageIcon getImageCard(String image) {
@@ -52,29 +64,16 @@ public class Game extends JPanel implements MouseListener, Runnable{
 		return new ImageIcon(getClass().getResource(filepath));
 	}
 	
-	public void paintCard(Card card, int x, int y, int w, int h) {
-		mapCard.put(card, new Rectangle(x, y, w, h));
-		g2.drawImage(getImageCard(card.getValue()).getImage(), x, y, w, h, null);
+	public void paintCardsVertical(ArrayList<Card> deck, int x, int y, int w, int h) {
+		for(int i = 0; i < deck.size(); i++) {
+			g2.drawImage(getImageCard(deck.get(i).getValue()).getImage(), x, y+i*disY, w, h, null);
+		}
 	}
 	
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		g2 = (Graphics2D) g;
-//		for(int i = 0; i < ply.size(); i++) {
-//			paintCard(ply.get(i), 170 + disX*i, 480, cardWidth, cardHeight);
-//		}
-//		
-//		for(int i = 0; i < 13; i++) {
-//			g.drawImage(getImageCard("3C").getImage(), 210+disX*i, 30, cardWidth, cardHeight, null);
-//		}
-//		
-//		for(int i = 0; i < 13; i++) {
-//			g.drawImage(getImageCard("3C").getImage(), 20, 20+disY*i, cardWidth, cardHeight, null);
-//		}
-		drawPlayerPanelHorizontal(10, 320, 20, 250, 175, "Player 1");
-		drawPlayerPanelHorizontal(13, 320, 445, 250, 175, "Bot 1");
-		drawPlayerPanelVertical(8, 15, 180, 120, 270, "Player 3");
-		drawPlayerPanelVertical(8, 750, 180, 120, 270, "Player 3");
+	public void paintCardsHorizontal(ArrayList<Card> deck, int x, int y, int w, int h) {
+		for(int i = 0; i < deck.size(); i++) {
+			g2.drawImage(getImageCard(deck.get(i).getValue()).getImage(), x+i*disX, y, w, h, null);
+		}
 	}
 	
 	public void drawPlayerPanelHorizontal(int cardsNum, int x, int y, int w, int h, String player) {
@@ -96,7 +95,7 @@ public class Game extends JPanel implements MouseListener, Runnable{
 		g2.drawString(player, w/2-length/2+x, y+30);
 		drawButton(x+20, y+45, 80, 30, "show", 20);
 		g2.setFont(getFont().deriveFont(32F));
-		g2.drawString(Integer.toString(cardsNum), x+50, y+110);
+		g2.drawString(Integer.toString(cardsNum), x+45, y+110);
 	}
 	
 	public void drawButton(int x, int y, int w, int h) {
@@ -118,17 +117,42 @@ public class Game extends JPanel implements MouseListener, Runnable{
 		g2.setFont(getFont().deriveFont(size));
 		g2.drawString(btn, x+18, y+21);
 	}
-
+	
+	public void drawStartState() {
+		for(int i = 0; i < players; i++) {
+			String player = "Player " + (i+1);
+			if(i == 0) {
+				drawPlayerPanelHorizontal(playerCard[i].size(), 320, 20, 250, 175, player);
+			}
+			else if(i == 1) {
+				drawPlayerPanelVertical(playerCard[i].size(), 750, 180, 120, 270, player);
+			}
+			else if(i == 2) {
+				drawPlayerPanelHorizontal(playerCard[i].size(), 320, 445, 250, 175, player);
+			}
+			else if(i == 3) {
+				drawPlayerPanelVertical(playerCard[i].size(), 15, 180, 120, 270, player);
+			}
+		}
+		
+		for(int i = players; i < playersNum; i++) {
+			String player = "Bot " + (i - players + 1);
+			if(i == 1) {
+				drawPlayerPanelVertical(playerCard[i].size(), 750, 180, 120, 270, player);
+			}
+			else if(i == 2) {
+				drawPlayerPanelHorizontal(playerCard[i].size(), 320, 445, 250, 175, player);
+			}
+			else if(i == 3) {
+				drawPlayerPanelVertical(playerCard[i].size(), 15, 180, 120, 270, player);
+			}
+		}
+	}
+	
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
-		for(Card card : ply) {
-			Rectangle bound = mapCard.get(card);
-			if(bound.contains(e.getPoint())) {
-				selected = card;
-				break;
-			}
-		}
+		
 	}
 
 	@Override
@@ -151,12 +175,6 @@ public class Game extends JPanel implements MouseListener, Runnable{
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void run() {
 		// TODO Auto-generated method stub
 		
 	}
