@@ -20,7 +20,9 @@ public class Mode extends JPanel implements KeyListener, Runnable{
 	private int bots = 0, minBots, maxBots;
 	private String modeState = "Mode";
 	Thread gameThread;
-	private Game game;
+	private GameTLMN game2;
+	private GameTLMB game3;
+	private GameBaCay game1;
 	
 	public Mode() {
 		this.setPreferredSize(new Dimension(500, 500));
@@ -190,6 +192,7 @@ public class Mode extends JPanel implements KeyListener, Runnable{
 				}
 				if(code == KeyEvent.VK_ENTER) {
 					//add later
+					gameThread = null;
 					getGameType();
 				}
 			}
@@ -352,13 +355,14 @@ public class Mode extends JPanel implements KeyListener, Runnable{
 	
 	public void getGameType() {
 		if(typeGame == 0) {
-			// add later
+			game1 = new GameBaCay("Ba cây", players, bots);
 		}
 		else if(typeGame == 1) {
-			game = new GameTLMN("Tiến lên miền nam", players, bots);
+			game2 = new GameTLMN("Tiến lên miền nam", players, bots);
+			game2.gameStart();
 		}
 		else {
-			// add later
+			game3 = new GameTLMB("Tiến lên miền bắc", players, bots);
 		}
 	}
 

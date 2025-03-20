@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -18,13 +19,13 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-public class Game extends JPanel implements MouseListener{
+public class Game extends JPanel{
+	private JFrame window = new JFrame();
+	protected int height = 670, width = 970;
+	private Color background = new Color(4, 191, 29);
 	protected int bots;
 	protected int players;
 	protected int playersNum;
-	private JFrame window = new JFrame();
-	private int height = 670, width = 900;
-	private Color background = new Color(4, 191, 29);
 	protected int cardHeight = 140;
 	protected int cardWidth = 89;
 	protected int disX = 30;
@@ -33,9 +34,10 @@ public class Game extends JPanel implements MouseListener{
 	protected ArrayList<Card> deck;
 	protected Card host = new Card();
 	protected int maxCards;
-	Graphics2D g2;
-	Map<Card, Rectangle> mapCard = new HashMap<Card, Rectangle>();
-	Card selected;
+	protected int turn = 1, show = 0;
+	protected Graphics2D g2;
+	protected Map<Card, Rectangle> mapCard = new HashMap<Card, Rectangle>();
+	protected ArrayList<Rectangle> btn = new ArrayList<Rectangle>();
 	
 	public Game(String title, int players, int bots) {
 		this.bots = bots;
@@ -47,11 +49,25 @@ public class Game extends JPanel implements MouseListener{
 		window.setResizable(false);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setVisible(true);
-		
 		this.setBackground(background);
 		deck = host.createDeck();
+		getButtonShow();
+		window.add(setPanelPlay(), BorderLayout.EAST);
 		window.add(this);
-		System.out.println(this.players);
+	}
+	
+	public JPanel setPanelPlay() {
+		JPanel panel = new JPanel(new GridLayout(3, 1, 5, 5));
+		JButton btnPlay = new JButton("Play");
+		JButton btnSkip = new JButton("SKip");
+		JButton btnHide = new JButton("Hide");
+		panel.add(btnPlay);
+		panel.add(btnSkip);
+		panel.add(btnHide);
+		JPanel board = new JPanel();
+		board.add(panel, BorderLayout.PAGE_START);
+		//panel.setIgnoreRepaint(true);
+		return board;
 	}
 	
 	public void newGame(int maxCards, int playersNum) {
@@ -73,6 +89,21 @@ public class Game extends JPanel implements MouseListener{
 	public void paintCardsHorizontal(ArrayList<Card> deck, int x, int y, int w, int h) {
 		for(int i = 0; i < deck.size(); i++) {
 			g2.drawImage(getImageCard(deck.get(i).getValue()).getImage(), x+i*disX, y, w, h, null);
+		}
+	}
+	
+	public void getButtonShow() {
+		if(players > 0) {
+			btn.add(new Rectangle(445, 80, 80, 30));
+		}
+		if(players > 1) {
+			btn.add(new Rectangle(770, 225, 80, 30));
+		}
+		if(players > 2) {
+			btn.add(new Rectangle(445, 505, 80, 30));
+		}
+		if(players == 4) {
+			btn.add(new Rectangle(35, 225, 80, 30));
 		}
 	}
 	
@@ -114,8 +145,40 @@ public class Game extends JPanel implements MouseListener{
 		g2.setColor(new Color(255, 255, 255));
 		g2.setStroke(new BasicStroke(3));
 		g2.drawRoundRect(x, y, w, h, 0, 0);
+		
 		g2.setFont(getFont().deriveFont(size));
 		g2.drawString(btn, x+18, y+21);
+	}
+	
+	public void drawStatePlaying() {
+		for(int i = 0; i < players; i++) {
+			String player = "Player " + (i+1);
+			if(i == 0 && turn != i + 1) {
+				drawPlayerPanelHorizontal(playerCard[i].size(), 320, 20, 250, 175, player);
+			}
+			else if(i == 1 && turn != i + 1) {
+				drawPlayerPanelVertical(playerCard[i].size(), 750, 180, 120, 270, player);
+			}
+			else if(i == 2 && turn != i + 1) {
+				drawPlayerPanelHorizontal(playerCard[i].size(), 320, height - 225, 250, 175, player);
+			}
+			else if(i == 3 && turn != i + 1) {
+				drawPlayerPanelVertical(playerCard[i].size(), 15, 180, 120, 270, player);
+			}
+		}
+		
+		for(int i = players; i < playersNum; i++) {
+			String player = "Bot " + (i - players + 1);
+			if(i == 1) {
+				drawPlayerPanelVertical(playerCard[i].size(), 750, 180, 120, 270, player);
+			}
+			else if(i == 2) {
+				drawPlayerPanelHorizontal(playerCard[i].size(), 320, height - 225, 250, 175, player);
+			}
+			else if(i == 3) {
+				drawPlayerPanelVertical(playerCard[i].size(), 15, 180, 120, 270, player);
+			}
+		}
 	}
 	
 	public void drawStartState() {
@@ -128,7 +191,7 @@ public class Game extends JPanel implements MouseListener{
 				drawPlayerPanelVertical(playerCard[i].size(), 750, 180, 120, 270, player);
 			}
 			else if(i == 2) {
-				drawPlayerPanelHorizontal(playerCard[i].size(), 320, 445, 250, 175, player);
+				drawPlayerPanelHorizontal(playerCard[i].size(), 320, height - 225, 250, 175, player);
 			}
 			else if(i == 3) {
 				drawPlayerPanelVertical(playerCard[i].size(), 15, 180, 120, 270, player);
@@ -141,41 +204,11 @@ public class Game extends JPanel implements MouseListener{
 				drawPlayerPanelVertical(playerCard[i].size(), 750, 180, 120, 270, player);
 			}
 			else if(i == 2) {
-				drawPlayerPanelHorizontal(playerCard[i].size(), 320, 445, 250, 175, player);
+				drawPlayerPanelHorizontal(playerCard[i].size(), 320, height - 225, 250, 175, player);
 			}
 			else if(i == 3) {
 				drawPlayerPanelVertical(playerCard[i].size(), 15, 180, 120, 270, player);
 			}
 		}
-	}
-	
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
 }
