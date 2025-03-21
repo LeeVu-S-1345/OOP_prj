@@ -15,6 +15,7 @@ public class GameTLMN extends Game implements MouseListener, Runnable{
 		super(title, players, bots);
 		maxCards = 13;
 		newGame(maxCards, playersNum);
+		setCardButton();
 		this.addMouseListener(this);
 	}
 	

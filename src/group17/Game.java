@@ -36,7 +36,7 @@ public class Game extends JPanel{
 	protected int maxCards;
 	protected int turn = 1, show = 0;
 	protected Graphics2D g2;
-	protected Map<Card, Rectangle> mapCard = new HashMap<Card, Rectangle>();
+	protected Map<Card, Rectangle>[] mapCard;
 	protected ArrayList<Rectangle> btn = new ArrayList<Rectangle>();
 	
 	public Game(String title, int players, int bots) {
@@ -104,6 +104,28 @@ public class Game extends JPanel{
 		}
 		if(players == 4) {
 			btn.add(new Rectangle(35, 225, 80, 30));
+		}
+	}
+	
+	public void setCardButton() {
+		// For player 1
+		mapCard = new HashMap[players];
+		for(int i = 0; i < players; i++) {
+			mapCard[i] = new HashMap<Card, Rectangle>();
+		}
+		for(int i = 0; i < maxCards; i++) {
+			if(players > 0) {
+				mapCard[0].put(playerCard[0].get(i), new Rectangle(320, 20, 250, 175));
+			}
+			if(players > 1) {
+				mapCard[1].put(playerCard[1].get(i), new Rectangle(750, 180, 120, 270));
+			}
+			if(players > 2) {
+				mapCard[2].put(playerCard[2].get(i), new Rectangle(750, 180, 120, 270));
+			}
+			if(players > 3) {
+				mapCard[3].put(playerCard[3].get(i), new Rectangle(15, 180, 120, 270));
+			}
 		}
 	}
 	
