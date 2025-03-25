@@ -8,6 +8,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -19,8 +21,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-public class Game extends JPanel{
-	private JFrame window = new JFrame();
+public class Game extends JPanel implements ActionListener{
+	protected JFrame window = new JFrame();
 	protected int height = 670, width = 970;
 	private Color background = new Color(4, 191, 29);
 	protected int bots;
@@ -34,9 +36,10 @@ public class Game extends JPanel{
 	protected ArrayList<Card> deck;
 	protected Card host = new Card();
 	protected int maxCards;
-	protected int turn = 1, show = 0;
+	protected int turn = 0, show = 0;
 	protected Graphics2D g2;
 	protected Map<Card, Rectangle>[] mapCard;
+	protected ArrayList<Integer>[] cardState;
 	protected ArrayList<Rectangle> btn = new ArrayList<Rectangle>();
 	
 	public Game(String title, int players, int bots) {
@@ -52,22 +55,7 @@ public class Game extends JPanel{
 		this.setBackground(background);
 		deck = host.createDeck();
 		getButtonShow();
-		window.add(setPanelPlay(), BorderLayout.EAST);
 		window.add(this);
-	}
-	
-	public JPanel setPanelPlay() {
-		JPanel panel = new JPanel(new GridLayout(3, 1, 5, 5));
-		JButton btnPlay = new JButton("Play");
-		JButton btnSkip = new JButton("SKip");
-		JButton btnHide = new JButton("Hide");
-		panel.add(btnPlay);
-		panel.add(btnSkip);
-		panel.add(btnHide);
-		JPanel board = new JPanel();
-		board.add(panel, BorderLayout.PAGE_START);
-		//panel.setIgnoreRepaint(true);
-		return board;
 	}
 	
 	public void newGame(int maxCards, int playersNum) {
@@ -80,15 +68,49 @@ public class Game extends JPanel{
 		return new ImageIcon(getClass().getResource(filepath));
 	}
 	
-	public void paintCardsVertical(ArrayList<Card> deck, int x, int y, int w, int h) {
+	public void paintCardsVertical(ArrayList<Card> deck, int turn, int x, int y, int w, int h) {
 		for(int i = 0; i < deck.size(); i++) {
-			g2.drawImage(getImageCard(deck.get(i).getValue()).getImage(), x, y+i*disY, w, h, null);
+			if(cardState[turn].get(i) == 1) {
+				g2.drawImage(getImageCard(deck.get(i).getValue()).getImage(), x - 20, y+i*disY, w, h, null);
+				if(i < deck.size() - 1) {
+					mapCard[turn].put(playerCard[turn].get(i), new Rectangle(x - 20, y+i*disY, w, disY));
+				}
+				else {
+					mapCard[turn].put(playerCard[turn].get(i), new Rectangle(x - 20, y+i*disY, w, h));
+				}
+			}
+			else{
+				g2.drawImage(getImageCard(deck.get(i).getValue()).getImage(), x, y+i*disY, w, h, null);
+				if(i < deck.size() - 1) {
+					mapCard[turn].put(playerCard[turn].get(i), new Rectangle(x, y+i*disY, w, disY));
+				}
+				else {
+					mapCard[turn].put(playerCard[turn].get(i), new Rectangle(x, y+i*disY, w, h));
+				}
+			}
 		}
 	}
 	
-	public void paintCardsHorizontal(ArrayList<Card> deck, int x, int y, int w, int h) {
+	public void paintCardsHorizontal(ArrayList<Card> deck, int turn, int x, int y, int w, int h) {
 		for(int i = 0; i < deck.size(); i++) {
-			g2.drawImage(getImageCard(deck.get(i).getValue()).getImage(), x+i*disX, y, w, h, null);
+			if(cardState[turn].get(i) == 1) {
+				g2.drawImage(getImageCard(deck.get(i).getValue()).getImage(), x+i*disX, y - 20, w, h, null);
+				if(i < deck.size() - 1) {
+					mapCard[turn].put(playerCard[turn].get(i), new Rectangle(x+i*disX, y - 20, disX, h));
+				}
+				else {
+					mapCard[turn].put(playerCard[turn].get(i), new Rectangle(x+i*disX, y - 20, w, h));
+				}
+			}
+			else{
+				g2.drawImage(getImageCard(deck.get(i).getValue()).getImage(), x+i*disX, y, w, h, null);
+				if(i < deck.size() - 1) {
+					mapCard[turn].put(playerCard[turn].get(i), new Rectangle(x+i*disX, y, disX, h));
+				}
+				else {
+					mapCard[turn].put(playerCard[turn].get(i), new Rectangle(x+i*disX, y, w, h));
+				}
+			}
 		}
 	}
 	
@@ -108,23 +130,48 @@ public class Game extends JPanel{
 	}
 	
 	public void setCardButton() {
-		// For player 1
+		cardState = new ArrayList[players];
 		mapCard = new HashMap[players];
 		for(int i = 0; i < players; i++) {
 			mapCard[i] = new HashMap<Card, Rectangle>();
+			cardState[i] = new ArrayList<Integer>();
 		}
 		for(int i = 0; i < maxCards; i++) {
 			if(players > 0) {
-				mapCard[0].put(playerCard[0].get(i), new Rectangle(320, 20, 250, 175));
+//				if(i < maxCards-1) {
+//					mapCard[0].put(playerCard[0].get(i), new Rectangle(width/2-(12*disX+cardWidth)/2 + disX*i, 25, disX, cardHeight));
+//				}
+//				else {
+//					mapCard[0].put(playerCard[0].get(i), new Rectangle(width/2-(12*disX+cardWidth)/2 + disX*i, 25, cardWidth, cardHeight));
+//				}
+				cardState[0].add(0);
 			}
 			if(players > 1) {
-				mapCard[1].put(playerCard[1].get(i), new Rectangle(750, 180, 120, 270));
+//				if(i < maxCards-1) {
+//					mapCard[1].put(playerCard[1].get(i), new Rectangle(width-(cardWidth+95), height/2-(12*disY+cardHeight)/2+disY*i, cardWidth, disY));
+//				}
+//				else{
+//					mapCard[1].put(playerCard[1].get(i), new Rectangle(width-(cardWidth+95), height/2-(12*disY+cardHeight)/2+disY*i, cardWidth, cardHeight));
+//				}
+				cardState[1].add(0);
 			}
 			if(players > 2) {
-				mapCard[2].put(playerCard[2].get(i), new Rectangle(750, 180, 120, 270));
+//				if(i < maxCards) {
+//					mapCard[2].put(playerCard[2].get(i), new Rectangle(width/2-(12*disX+cardWidth)/2 + disX*i, height - (cardHeight+50), cardWidth, cardHeight));
+//				}
+//				else{
+//					mapCard[2].put(playerCard[2].get(i), new Rectangle(width/2-(12*disX+cardWidth)/2 + disX*i, height - (cardHeight+50), cardWidth, cardHeight));
+//				}
+				cardState[2].add(0);
 			}
 			if(players > 3) {
-				mapCard[3].put(playerCard[3].get(i), new Rectangle(15, 180, 120, 270));
+//				if(i < maxCards) {
+//					mapCard[3].put(playerCard[3].get(i), new Rectangle(30, height/2-(12*disY+cardHeight)/2 + disY*i, cardWidth, cardHeight));
+//				}
+//				else{
+//					mapCard[3].put(playerCard[3].get(i), new Rectangle(30, height/2-(12*disY+cardHeight)/2 + disY*i, cardWidth, cardHeight));
+//				}
+				cardState[3].add(0);
 			}
 		}
 	}
@@ -175,16 +222,16 @@ public class Game extends JPanel{
 	public void drawStatePlaying() {
 		for(int i = 0; i < players; i++) {
 			String player = "Player " + (i+1);
-			if(i == 0 && turn != i + 1) {
+			if(i == 0 && turn != i) {
 				drawPlayerPanelHorizontal(playerCard[i].size(), 320, 20, 250, 175, player);
 			}
-			else if(i == 1 && turn != i + 1) {
+			else if(i == 1 && turn != i) {
 				drawPlayerPanelVertical(playerCard[i].size(), 750, 180, 120, 270, player);
 			}
-			else if(i == 2 && turn != i + 1) {
+			else if(i == 2 && turn != i) {
 				drawPlayerPanelHorizontal(playerCard[i].size(), 320, height - 225, 250, 175, player);
 			}
-			else if(i == 3 && turn != i + 1) {
+			else if(i == 3 && turn != i) {
 				drawPlayerPanelVertical(playerCard[i].size(), 15, 180, 120, 270, player);
 			}
 		}
@@ -232,5 +279,11 @@ public class Game extends JPanel{
 				drawPlayerPanelVertical(playerCard[i].size(), 15, 180, 120, 270, player);
 			}
 		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }
