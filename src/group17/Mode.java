@@ -363,6 +363,7 @@ public class Mode extends JPanel implements KeyListener, Runnable{
 		}
 		else {
 			game3 = new GameTLMB("Tiến lên miền bắc", players, bots);
+			game3.gameStart();
 		}
 	}
 

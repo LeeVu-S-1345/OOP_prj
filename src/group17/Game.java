@@ -58,11 +58,6 @@ public class Game extends JPanel implements ActionListener{
 		window.add(this);
 	}
 	
-	public void newGame(int maxCards, int playersNum) {
-		deck = host.shuffleDeck(deck);
-		playerCard = host.getPlayerCard(deck, playersNum, maxCards);
-	}
-	
 	public ImageIcon getImageCard(String image) {
 		String filepath = "/images/" + image + ".png";
 		return new ImageIcon(getClass().getResource(filepath));
@@ -137,41 +132,8 @@ public class Game extends JPanel implements ActionListener{
 			cardState[i] = new ArrayList<Integer>();
 		}
 		for(int i = 0; i < maxCards; i++) {
-			if(players > 0) {
-//				if(i < maxCards-1) {
-//					mapCard[0].put(playerCard[0].get(i), new Rectangle(width/2-(12*disX+cardWidth)/2 + disX*i, 25, disX, cardHeight));
-//				}
-//				else {
-//					mapCard[0].put(playerCard[0].get(i), new Rectangle(width/2-(12*disX+cardWidth)/2 + disX*i, 25, cardWidth, cardHeight));
-//				}
-				cardState[0].add(0);
-			}
-			if(players > 1) {
-//				if(i < maxCards-1) {
-//					mapCard[1].put(playerCard[1].get(i), new Rectangle(width-(cardWidth+95), height/2-(12*disY+cardHeight)/2+disY*i, cardWidth, disY));
-//				}
-//				else{
-//					mapCard[1].put(playerCard[1].get(i), new Rectangle(width-(cardWidth+95), height/2-(12*disY+cardHeight)/2+disY*i, cardWidth, cardHeight));
-//				}
-				cardState[1].add(0);
-			}
-			if(players > 2) {
-//				if(i < maxCards) {
-//					mapCard[2].put(playerCard[2].get(i), new Rectangle(width/2-(12*disX+cardWidth)/2 + disX*i, height - (cardHeight+50), cardWidth, cardHeight));
-//				}
-//				else{
-//					mapCard[2].put(playerCard[2].get(i), new Rectangle(width/2-(12*disX+cardWidth)/2 + disX*i, height - (cardHeight+50), cardWidth, cardHeight));
-//				}
-				cardState[2].add(0);
-			}
-			if(players > 3) {
-//				if(i < maxCards) {
-//					mapCard[3].put(playerCard[3].get(i), new Rectangle(30, height/2-(12*disY+cardHeight)/2 + disY*i, cardWidth, cardHeight));
-//				}
-//				else{
-//					mapCard[3].put(playerCard[3].get(i), new Rectangle(30, height/2-(12*disY+cardHeight)/2 + disY*i, cardWidth, cardHeight));
-//				}
-				cardState[3].add(0);
+			for(int j = 1; j <= players; j++) {
+				cardState[j-1].add(0);
 			}
 		}
 	}
@@ -278,6 +240,21 @@ public class Game extends JPanel implements ActionListener{
 			else if(i == 3) {
 				drawPlayerPanelVertical(playerCard[i].size(), 15, 180, 120, 270, player);
 			}
+		}
+	}
+	
+	public void drawTurn(float size) {
+		if(turn < players) {
+			String player = "Turn: Player " + (turn + 1);
+			g2.setColor(Color.magenta);
+			g2.setFont(getFont().deriveFont(size));
+			g2.drawString(player, 20, 30);
+		}
+		else {
+			String player = "Turn: Bot " + (turn - players + 1);
+			g2.setColor(Color.magenta);
+			g2.setFont(getFont().deriveFont(size));
+			g2.drawString(player, 20, 30);
 		}
 	}
 
