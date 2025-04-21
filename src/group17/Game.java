@@ -140,7 +140,7 @@ public class Game extends JPanel implements ActionListener{
 	
 	public void drawPlayerPanelHorizontal(int cardsNum, int x, int y, int w, int h, String player) {
 		drawButton(x, y, w, h);
-		g2.drawImage(getImageCard("back").getImage(), x+10, y+15, cardWidth, cardHeight, null);
+		g2.drawImage(getImageCard("cardback").getImage(), x+10, y+15, cardWidth, cardHeight, null);
 		g2.setFont(getFont().deriveFont(28F));
 		int length = (int)g2.getFontMetrics().getStringBounds(player, g2).getWidth();
 		g2.drawString(player, x+(w+cardWidth+10)/2-length/2, y+40);
@@ -151,7 +151,7 @@ public class Game extends JPanel implements ActionListener{
 	
 	public void drawPlayerPanelVertical(int cardsNum, int x, int y, int w, int h, String player) {
 		drawButton(x, y, w, h);
-		g2.drawImage(getImageCard("back").getImage(), x+14, y+120, cardWidth, cardHeight, null);
+		g2.drawImage(getImageCard("cardback").getImage(), x+14, y+120, cardWidth, cardHeight, null);
 		g2.setFont(getFont().deriveFont(28F));
 		int length = (int)g2.getFontMetrics().getStringBounds(player, g2).getWidth();
 		g2.drawString(player, w/2-length/2+x, y+30);

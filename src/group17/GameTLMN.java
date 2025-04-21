@@ -160,22 +160,22 @@ public class GameTLMN extends Game implements MouseListener, Runnable{
 						numChosen++;
 						cardState[turn].set(i, 1);
 						
-						if(turn == 0 || turn == 2) {
-							mapCard[turn].get(playerCard[turn].get(i)).translate(0, -20);
-						}
-						else if(turn == 1 || turn == 3) {
-							mapCard[turn].get(playerCard[turn].get(i)).translate(-20, 0);
-						}
+//						if(turn == 0 || turn == 2) {
+//							mapCard[turn].get(playerCard[turn].get(i)).translate(0, -20);
+//						}
+//						else if(turn == 1 || turn == 3) {
+//							mapCard[turn].get(playerCard[turn].get(i)).translate(-20, 0);
+//						}
 					}
 					else if(cardState[turn].get(i) == 1) {
 						numChosen--;
 						cardState[turn].set(i, 0);
-						if(turn == 0 || turn == 2) {
-							mapCard[turn].get(playerCard[turn].get(i)).translate(0, 20);
-						}
-						else if(turn == 1 || turn == 3) {
-							mapCard[turn].get(playerCard[turn].get(i)).translate(20, 0);
-						}
+//						if(turn == 0 || turn == 2) {
+//							mapCard[turn].get(playerCard[turn].get(i)).translate(0, 20);
+//						}
+//						else if(turn == 1 || turn == 3) {
+//							mapCard[turn].get(playerCard[turn].get(i)).translate(20, 0);
+//						}
 					}
 				}
 			}
